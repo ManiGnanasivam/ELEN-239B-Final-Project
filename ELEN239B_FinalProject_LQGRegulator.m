@@ -1,6 +1,6 @@
 % System Constants
-m = 1; %kg
-b = .05; %Ns/m
+m = 1;
+b = .05;
 
 % SS Model - Mass cart subject to drag forces
 A = [-b/m];
@@ -9,8 +9,8 @@ C = [1];
 D = [0];
 sys = ss(A,B,C,D);
 
-Q = [1];
-R = [10];
+Q = [1]; % Weighting Matrix
+R = [10]; % Noise Covariance for the LQR
 
 LQR = lqr(sys,Q,R); % Compute LQR Gain u = -K*x
 
@@ -28,12 +28,14 @@ LQG = lqgreg(Kf,LQR);
 % Connect LQG Regulator to system plant
 G1 = feedback(sys,LQG,1);
 
-% Initial Conditions
+% Subject system to Inputs
+
+% Initial Condition Response
 x0 = [5 5]';
 [y, t, x] = initial(G1,x0);
 figure(1)
 clf
-noisy = x(:,1) + Rv*randn(size(x(:,1)));
+noisy = x(:,1) + Rv*randn(size(x(:,1))); %Generate noisy velocity data for comparison
 plot(t,noisy,'b','Linewidth',2)
 hold on;
 plot(t,x(:,1),'k','Linewidth',2) % Velocity
@@ -47,7 +49,7 @@ legend('Sensor Value','True Value','Kalman Estimate')
 [y, t, x] = impulse(G1);
 figure(2)
 clf
-noisy = x(:,1) + Rv*randn(size(x(:,1)));
+noisy = x(:,1) + Rv*randn(size(x(:,1))); %Generate noisy velocity data for comparison
 plot(t,noisy,'b','Linewidth',2)
 hold on;
 plot(t,x(:,1),'k','Linewidth',2) % Velocity
@@ -61,7 +63,7 @@ legend('Sensor Value','True Value','Kalman Estimate')
 [y, t, x] = step(G1);
 figure(3)
 clf
-noisy = x(:,1) + Rv*randn(size(x(:,1)));
+noisy = x(:,1) + Rv*randn(size(x(:,1))); %Generate noisy velocity data for comparison
 plot(t,noisy,'b','Linewidth',2)
 hold on;
 plot(t,x(:,1),'k','Linewidth',2) % Velocity
