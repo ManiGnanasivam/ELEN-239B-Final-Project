@@ -31,46 +31,62 @@ G1 = feedback(sys,LQG,1);
 % Subject system to Inputs
 
 % Initial Condition Response
-x0 = [5 5]';
-[y, t, x] = initial(G1,x0);
+t = 0 : 0.1 : 100;
+u = 0.1*randn(size(t))';
+[y, t, x] = lsim(G1,u,t);
+[y1, t1, x1] = lsim(sys,u,t);
 figure(1)
 clf
 noisy = x(:,1) + Rv*randn(size(x(:,1))); %Generate noisy velocity data for comparison
 plot(t,noisy,'b','Linewidth',2)
 hold on;
-plot(t,x(:,1),'k','Linewidth',2) % Velocity
+plot(t,x(:,1),'k','Linewidth',2)
 hold on;
 plot(t,x(:,2),'g','Linewidth',2)
+hold on;
+plot(t1,x1(:,1),'r','Linewidth',2)
 xlabel('Time, t [s]')
 ylabel('Velocity, v [m/s]')
-legend('Sensor Value','True Value','Kalman Estimate')
+legend('Sensor Value','True Value','Kalman Estimate','Unregulated Velocity')
+mseRand = sqrt(mean((x(:,2)-x(:,1)).^2))
+rmsReg = sqrt(mean(x(:,1).^2))
+rmsUnReg = sqrt(mean(x1(:,1).^2))
+
 
 % Impulse Response
-[y, t, x] = impulse(G1);
+[y, t, x] = impulse(G1,20);
+[y1, t1, x1] = impulse(sys,20);
 figure(2)
 clf
 noisy = x(:,1) + Rv*randn(size(x(:,1))); %Generate noisy velocity data for comparison
 plot(t,noisy,'b','Linewidth',2)
 hold on;
-plot(t,x(:,1),'k','Linewidth',2) % Velocity
+plot(t,x(:,1),'k','Linewidth',2)
 hold on;
 plot(t,x(:,2),'g','Linewidth',2)
+hold on;
+plot(t1,x1(:,1),'r','Linewidth',2)
 xlabel('Time, t [s]')
 ylabel('Velocity, v [m/s]')
-legend('Sensor Value','True Value','Kalman Estimate')
+legend('Sensor Value','True Value','Kalman Estimate','Unregulated Velocity')
+mseImpulse = sqrt(mean((x(:,2)-x(:,1)).^2))
 
 % Step Response
-[y, t, x] = step(G1);
+[y, t, x] = step(G1,20);
+[y1, t1, x1] = step(sys,20);
 figure(3)
 clf
 noisy = x(:,1) + Rv*randn(size(x(:,1))); %Generate noisy velocity data for comparison
 plot(t,noisy,'b','Linewidth',2)
 hold on;
-plot(t,x(:,1),'k','Linewidth',2) % Velocity
+plot(t,x(:,1),'k','Linewidth',2)
 hold on;
 plot(t,x(:,2),'g','Linewidth',2)
 hold on;
+plot(t1,x1(:,1),'r','Linewidth',2)
+hold on;
 xlabel('Time, t [s]')
 ylabel('Velocity, v [m/s]')
-legend('Sensor Value','True Value','Kalman Estimate')
+legend('Sensor Value','True Value','Kalman Estimate','Unregulated Velocity')
+mseStep = sqrt(mean((x(:,2)-x(:,1)).^2))
 
